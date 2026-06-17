@@ -1,21 +1,32 @@
+""" -- Products Routes -- """
+
 from fastapi.routing import APIRouter
 from fastapi import Depends
+from typing import Annotated
 from schemas.products_schema import ProductInput, ProductUpdate
+from db.database import get_session, SessionLocal
+from services.products_service import ProductService
+# from sqlalchemy import select
+# from models.products import Product
+
 
 router = APIRouter(
     prefix = "/products",
     tags = ["products,"],
-    dependencies = [] or None
+    dependencies = [] 
 )
 
 @router.get("/")
-def get_products():
-    return {"message":"Products"}
+def get_products(session:Annotated[SessionLocal, Depends(get_session)]):
+    service = ProductService()
+    response = service.read_products(session)
+    return response
 
 @router.post("/")
-def new_product(inputProduct:ProductInput):
-    # print(inputProduct)
-    pass
+def new_product(inputProduct:ProductInput,session:Annotated[SessionLocal, Depends(get_session)]):
+    service = ProductService()
+    response = service.create_product(session = session, new_product = inputProduct)
+    return response
 
 @router.get("/{id}")
 def get_product(id:int):

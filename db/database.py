@@ -9,6 +9,18 @@ SessionLocal = sessionmaker(
     autocommit=False
 )
 
+def get_session():
+    session = SessionLocal()
+    try:
+        yield session
+    
+    except Exception as e:
+        raise e
+        session.close()
+    
+    finally:
+        session.close()
+
 """ Db connection check """
 # with engine.connect() as conn:
 #     print("Db connected successfully!")

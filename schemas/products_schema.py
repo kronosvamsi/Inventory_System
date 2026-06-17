@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,ConfigDict
 
 class ProductInput(BaseModel):
     id:int
@@ -11,3 +11,12 @@ class ProductUpdate(BaseModel):
     name:str
     quantity:int
     price:float
+
+class ProductResponse(BaseModel):
+    id:int
+    name:str
+    sku:str
+    quantity:int
+    price:float
+    
+    model_config = ConfigDict(from_attributes = True) 
