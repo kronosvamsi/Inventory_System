@@ -3,6 +3,7 @@ from pydantic import BaseModel,ConfigDict
 class ProductInput(BaseModel):
     id:int
     name:str
+    category_id : int
     sku:str
     quantity:int
     price:float

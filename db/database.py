@@ -14,10 +14,6 @@ def get_session():
     try:
         yield session
     
-    except Exception as e:
-        raise e
-        session.close()
-    
     finally:
         session.close()
 
