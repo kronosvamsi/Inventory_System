@@ -4,12 +4,13 @@
  '''
 
 from fastapi import FastAPI
-from routes import products
+from routes import products,categories
 
 app = FastAPI()
 
-""" Products Router """
+""" Routers """
 app.include_router(products.router)
+app.include_router(categories.router)
 
 @app.get("/")
 def home():

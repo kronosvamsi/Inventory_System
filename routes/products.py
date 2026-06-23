@@ -12,7 +12,7 @@ from services.products_service import ProductService
 
 router = APIRouter(
     prefix = "/products",
-    tags = ["products,"],
+    tags = ["products"],
     dependencies = [] 
 )
 
