@@ -10,7 +10,7 @@ from services.category_service import CategoryService
 
 router = APIRouter(
     prefix = "/categories",
-    tags = ["catgories"],
+    tags = ["categories"],
     dependencies=[]
 )
 
@@ -60,3 +60,4 @@ def delete_category(id:int,session:Annotated[SessionLocal, Depends(get_session)]
     service = CategoryService()
     service.delete_categorybyId(id = id, session = session)
     return {"message":"A Category deleted"}
+
