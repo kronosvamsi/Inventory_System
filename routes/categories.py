@@ -3,7 +3,7 @@
 from fastapi.routing import APIRouter
 from fastapi import Depends
 from typing import Annotated
-from schemas.category_schema import CategoryInput, CategoryResponse
+from schemas.category_schema import CategoryInput, CategoryResponse, CategoryUpdate
 from db.database import SessionLocal, get_session
 from services.category_service import CategoryService
 
@@ -45,9 +45,18 @@ def get_category(id:int, session:Annotated[SessionLocal, Depends(get_session)]):
         }
 
 @router.patch("/{id}")
-def update_category(id:int):
-    return {"message":"A category update"}
+def update_category(id:int,
+                    inputCategory:CategoryUpdate, 
+                    session:Annotated[SessionLocal, Depends(get_session)]):
+    service = CategoryService()
+    response = service.update_categorybyId(id = id,input_category = inputCategory,session = session)
+    return {
+        "message":"A category update",
+        "response":response
+        }
 
 @router.delete("/{id}")
-def delete_category(id:int):
+def delete_category(id:int,session:Annotated[SessionLocal, Depends(get_session)]):
+    service = CategoryService()
+    service.delete_categorybyId(id = id, session = session)
     return {"message":"A Category deleted"}

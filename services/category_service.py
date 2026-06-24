@@ -30,4 +30,23 @@ class CategoryService():
         session = kwargs['session']
         db_record = session.scalars(select(Category).filter_by(id=id)).first()
         return CategoryResponse.model_validate(db_record)
+    
+    def update_categorybyId(self,**kwargs):
+        session = kwargs["session"]
+        new_category = kwargs["input_category"]
+        id = kwargs["id"]
+        db_record = session.scalars(select(Category).filter_by(id=id)).first()
+        update_data = new_category.model_dump()
+        for key,val in update_data.items():
+            setattr(db_record,key,val)
         
+        session.commit()
+        session.refresh(db_record)
+        return db_record
+    
+    def delete_categorybyId(self,**kwargs):
+        session = kwargs["session"]
+        id = kwargs["id"]
+        db_record = session.scalars(select(Category).filter_by(id=id)).first()
+        session.delete(db_record)
+        session.commit()
