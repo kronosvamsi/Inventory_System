@@ -29,4 +29,5 @@ class Product(Base):
         "InStock",
         back_populates="product"
     )
+    inventory = relationship("Inventory", back_populates="product")
 

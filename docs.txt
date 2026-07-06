@@ -1,0 +1,13 @@
+## steps for db migrations using Alembic
+1. alembic revision --autogenerate -m "some change" -> To run and apply migration in db and autodetects the changes in models
+2. alembic upgrade head -> To upgrade the current head to latest migration
+3. alembic current ->  To check the current db revision
+4. alembic heads -> TO check the latest migration head
+5. alembic init -> Create the initial alembic file and settings
+
+## Steps to check and verify creation of tables in postgresql
+1. psql -U <username> -> To connect to the Postgres db
+2. \c [db_name] ->       TO connect the Db you wish
+3. \dt   ->              TO show the tables in Db
+4. \d [table_name] ->    TO show the columns in a table
+5. \q  ->                TO quit the db terminal

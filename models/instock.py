@@ -1,14 +1,17 @@
 """ Instock Table """
 
 from datetime import datetime
-from sqlalchemy import Integer,ForeignKey, Enum, DateTime, func
+from sqlalchemy import Integer,ForeignKey, Enum, DateTime, func, String
 from sqlalchemy.orm import mapped_column, Mapped,relationship
 from enum import Enum as Snum
 from db.base import Base
 
 class TransactionType(str, Snum):
-    STOCK_IN = "stock_in"
-    STOCK_OUT = "stock_out"
+    PURCHASE = "PURCHASE"
+    SALE = "SALE"
+    RETURN = "RETURN"
+    DAMAGE = "DAMAGE"
+    ADJUSTMENT = "ADJUSTMENT"
     
 
 class InStock(Base):
@@ -20,3 +23,6 @@ class InStock(Base):
     transaction_type:Mapped[TransactionType] = mapped_column(Enum(TransactionType), nullable=False)
     product = relationship("Product", back_populates = "in_stock")
     created_at:Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(),nullable = False)
+    reference_type:Mapped[str] = mapped_column(String(50), nullable=True)
+    reference_id:Mapped[int] = mapped_column(Integer, nullable = True)
+    
