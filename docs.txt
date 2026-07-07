@@ -11,3 +11,9 @@
 3. \dt   ->              TO show the tables in Db
 4. \d [table_name] ->    TO show the columns in a table
 5. \q  ->                TO quit the db terminal
+
+## inventory process
+1. recieve / sell the stock with input
+2. validate the input ( check product_id exists, stock quantity validation(value !=0))
+3. compare the stock availability with recieved stock
+4. update the stock quantity based on inventory type. Reject the process when the stock less than available
