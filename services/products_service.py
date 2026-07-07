@@ -3,6 +3,7 @@
 
 """
 from models.products import Product
+from models.inventory import Inventory
 from sqlalchemy import select
 from schemas.products_schema import ProductResponse
 
@@ -15,9 +16,14 @@ class ProductService():
     def create_product(self,**kwargs):
         session = kwargs['session']
         new_product = kwargs['new_product']
-        db_record = Product(**new_product.model_dump())
-        session.add(db_record)
+        
+        product = Product(**new_product.model_dump())
+        inventory = Inventory(product_id = product.id, quantity_available = product.quantity)
+        
+        session.add(product)
+        session.add(inventory)
         session.commit()
+        
         return new_product
     
     def read_products(self,session):

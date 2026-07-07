@@ -14,8 +14,8 @@ class TransactionType(str, Snum):
     ADJUSTMENT = "ADJUSTMENT"
     
 
-class InStock(Base):
-    __tablename__ = "in_stock"
+class InventoryTransaction(Base):
+    __tablename__ = "inventory_transactions"
     
     id:Mapped[int] = mapped_column(Integer, primary_key = True, index=True)
     product_id:Mapped[int] = mapped_column(ForeignKey("products.id"),nullable = False)

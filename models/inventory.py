@@ -12,3 +12,4 @@ class Inventory(Base):
     reorder_level:Mapped[int] = mapped_column(Integer, default =10,nullable=False)
     updated_at:Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(),nullable = False)
     product = relationship("Product", back_populates="inventory")
+
