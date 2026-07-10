@@ -34,7 +34,7 @@ class InventoryService():
             raise  NegativeQuantityError( message = "Quantity should be positive and greater than Zero",quantity= quantity)
     
     @db_exc_handler
-    def recieve_stock(self, db, request):
+    def receive_stock(self, db, request):
         self._validate_request_quantity(request.quantity)
         product = self._get_product(db,request.product_id)
         stock_record = self._get_inventory(db, request.product_id)
@@ -74,7 +74,7 @@ class InventoryService():
 
     @db_exc_handler
     def adjust_stock(self,db, request):
-        self._validate_request_quantity(request.quantity)
+        self._validate_request_quantity(request.new_quantity)
         product = self._get_product(db, request.product_id)
         inventory_record = self._get_inventory(db, request.product_id)
         

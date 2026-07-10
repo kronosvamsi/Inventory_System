@@ -25,7 +25,7 @@ def db_exc_handler(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except Exception as err:
             db_session = get_db_session(*args, **kwargs)
             handle_rollback(db_session,err)
