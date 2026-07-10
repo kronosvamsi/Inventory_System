@@ -9,6 +9,8 @@ from exceptions import (
     OutOfStockError, 
     ProductNotFoundError,
     NegativeQuantityError, 
+    NewQuantityError,
+    InventoryNotFoundError,
     db_exc_handler
 )
 
@@ -26,12 +28,18 @@ class InventoryService():
     
     
     def _get_inventory(self,db,product_id):
-        return db.scalars(select(Inventory).filter_by(product_id = product_id)).first()
-    
+        record  = db.scalars(select(Inventory).filter_by(product_id = product_id)).first()
+        if record is None:
+            raise InventoryNotFoundError(message = "No Inventory record found",product_id= product_id)
+        return record
     
     def _validate_request_quantity(self, quantity):
         if quantity <= 0:
             raise  NegativeQuantityError( message = "Quantity should be positive and greater than Zero",quantity= quantity)
+    
+    def _validate_new_quantity(self,quantity):
+        if quantity < 0:
+            raise NewQuantityError(message = "New Quantity should be positive(greater or equal to zero)", quantity = quantity)
     
     @db_exc_handler
     def receive_stock(self, db, request):
@@ -74,7 +82,7 @@ class InventoryService():
 
     @db_exc_handler
     def adjust_stock(self,db, request):
-        self._validate_request_quantity(request.new_quantity)
+        self._validate_new_quantity(request.new_quantity)
         product = self._get_product(db, request.product_id)
         inventory_record = self._get_inventory(db, request.product_id)
         
