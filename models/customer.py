@@ -13,3 +13,4 @@ class Customer(Base):
     state:Mapped[str] = mapped_column(String(50),nullable = False)
     pincode:Mapped[int] = mapped_column(Integer,nullable = False)
     email:Mapped[str] = mapped_column(String(60),nullable = False)
+    phone:Mapped[str] = mapped_column(String(20), nullable = False)
