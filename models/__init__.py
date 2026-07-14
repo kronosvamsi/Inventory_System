@@ -4,3 +4,8 @@ from .orders import Order
 from .users import User
 from .instock import InventoryTransaction
 from .inventory import Inventory
+from .supplier import Supplier
+from .customer import Customer
+from .purchase_order import PurchaseOrder
+from .sales_order import SalesOrder
+from .order_status import StatusType

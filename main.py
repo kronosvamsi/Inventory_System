@@ -4,7 +4,7 @@
  '''
 
 from fastapi import FastAPI
-from routes import products,categories,users,inventory
+from routes import products,categories,users,inventory,purchase
 from exceptions import all_exceptions_handlers
 
 
@@ -21,6 +21,7 @@ app.include_router(products.router)
 app.include_router(categories.router)
 app.include_router(users.router)
 app.include_router(inventory.router)
+app.include_router(purchase.router)
 
 @app.get("/")
 def home():

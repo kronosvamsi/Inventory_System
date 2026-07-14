@@ -1,7 +1,7 @@
 """ Supplier Table """
 
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.base import Base
 
 class Supplier(Base):
@@ -17,3 +17,4 @@ class Supplier(Base):
     pincode:Mapped[int] = mapped_column(Integer,nullable = False)
     email:Mapped[str] = mapped_column(String(50), nullable = False)
     phone:Mapped[str] = mapped_column(String(20), nullable = False)
+    purchase_order = relationship("PurchaseOrder" , back_populates = "supplier")

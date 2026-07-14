@@ -31,3 +31,7 @@ class Product(Base):
     )
     inventory = relationship("Inventory", back_populates="product")
 
+    purchase_order = relationship("PurchaseOrder",back_populates="product")
+
+    sales_order = relationship("SalesOrder" , back_populates="product")
+
