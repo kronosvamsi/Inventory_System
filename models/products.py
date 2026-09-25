@@ -9,12 +9,18 @@ class Product(Base):
     __tablename__ = "products"
     
     id:Mapped[int] =   mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
-    category_id:Mapped[int] = mapped_column(ForeignKey("categories.id"),nullable=False)
+    
     name:Mapped[str] = mapped_column(String(100),nullable=False)
-    sku:Mapped[str] =  mapped_column(String(50), unique=True)
-    quantity:Mapped[int] = mapped_column(Integer,default=0)
-    price:Mapped[float] = mapped_column(Numeric(10,2))
+    
+    category_id:Mapped[int] = mapped_column(ForeignKey("categories.id"),nullable=False)
+    
+    sku:Mapped[str] =  mapped_column(String(50), unique=True, nullable = False)
+    
+    price:Mapped[float] = mapped_column(Numeric(10,2), nullable= False)
+    
     created_at:Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default= func.now(), nullable = False)
+    
+    ## relationships
     category = relationship(
         "Category",
         back_populates="products"
@@ -29,9 +35,9 @@ class Product(Base):
         "InventoryTransaction",
         back_populates="product"
     )
-    inventory = relationship("Inventory", back_populates="product")
+    inventory =     relationship("Inventory", back_populates="product",uselist=False)
 
     purchase_order = relationship("PurchaseOrder",back_populates="product")
 
-    sales_order = relationship("SalesOrder" , back_populates="product")
+    sales_order =   relationship("SalesOrder" , back_populates="product")
 

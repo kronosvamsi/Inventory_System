@@ -1,9 +1,13 @@
 """ -- Products Routes -- """
 
 from fastapi.routing import APIRouter
-from fastapi import Depends
+from fastapi import Depends,status
 from typing import Annotated
-from schemas.products_schema import ProductInput, ProductUpdate
+from schemas.products_schema import (
+    ProductCreate,
+    ProductResponse,
+    ProductUpdate
+)
 from db.database import get_session, SessionLocal
 from services.products_service import ProductService
 # from sqlalchemy import select
@@ -16,27 +20,45 @@ router = APIRouter(
     dependencies = [] 
 )
 
-@router.get("/")
-def get_products(session:Annotated[SessionLocal, Depends(get_session)]):
-    service = ProductService()
-    response = service.read_products(session)
-    return response
 
-@router.post("/")
-def new_product(inputProduct:ProductInput,session:Annotated[SessionLocal, Depends(get_session)]):
-    service = ProductService()
-    response = service.create_product(session = session, new_product = inputProduct)
-    return response
+@router.get(
+    "/", 
+    response_model= list[ProductResponse]
+)
+def get_products(db:Annotated[SessionLocal, Depends(get_session)]):
+    return ProductService.read_products(db)
 
-@router.get("/{id}")
-def get_product(id:int):
-    return {"message":"Got product by Id"}
 
-@router.patch("/{id}")
-def update_product(id:int, new_update:ProductUpdate):
-    return {"message":new_update.model_dump()}
 
-@router.delete("/{id}")
-def delete_product(id:int):
-    return {"message":"Item deleted by Id"}
+@router.post(
+    "/", 
+    response_model = ProductResponse , 
+    status_code = status.HTTP_201_CREATED
+    )
+def new_product(product_data:ProductCreate,db:Annotated[SessionLocal, Depends(get_session)]):
+    return ProductService.create_product(db, product_data)
+
+
+
+@router.get(
+    "/{id}", 
+    response_model= ProductResponse
+    )
+def get_product(db : Annotated[SessionLocal, Depends(get_session)], id:int):
+    return ProductService.read_product_byid(db, id)
+
+
+@router.patch(
+    "/{id}", 
+    response_model = ProductResponse
+    )
+def update_product(id:int, product_data:ProductUpdate, db:Annotated[SessionLocal, Depends(get_session)]):
+    return ProductService.update_product_byid(db,id,product_data)
+
+
+@router.delete(
+    "/{id}"
+    )
+def delete_product(id:int , db:Annotated[SessionLocal, Depends(get_session)]):
+    return  ProductService.delete_product_byid(db,id)
 
