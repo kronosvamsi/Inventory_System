@@ -1,9 +1,9 @@
 """ -- Categories Routes -- """
 
 from fastapi.routing import APIRouter
-from fastapi import Depends
+from fastapi import Depends,status
 from typing import Annotated
-from schemas.category_schema import CategoryInput, CategoryResponse, CategoryUpdate
+from schemas.category_schema import CategoryCreate, CategoryResponse, CategoryUpdate
 from db.database import SessionLocal, get_session
 from services.category_service import CategoryService
 
@@ -14,50 +14,46 @@ router = APIRouter(
     dependencies=[]
 )
 
-@router.post("/")
-def new_category(inputCategory:CategoryInput, 
+@router.post("/",
+
+response_model = CategoryResponse,
+status_code = status.HTTP_201_CREATED
+)
+def new_category(inputcategory:CategoryCreate, 
                  session:Annotated[SessionLocal, Depends(get_session)]
                  ):
-    
-    service = CategoryService()
-    response = service.create_category(input_category = inputCategory, session = session)
-    return {
-            "message":"A new category added",
-            "response":response
-            }
+    return  CategoryService.create_category(session, inputcategory)
 
-@router.get("/")
+@router.get("/",
+response_model = list[CategoryResponse]
+
+)
 def get_categories(session:Annotated[SessionLocal, Depends(get_session)]):
-    service = CategoryService()
-    response = service.read_categories(session)
-    return {
-            "message":"A list of categories ",
-            "response" : response
-            }
+    
+    return  CategoryService.read_categories(session)
 
-@router.get("/{id}")
+@router.get(
+    "/{id}",
+    response_model = CategoryResponse
+)
 def get_category(id:int, session:Annotated[SessionLocal, Depends(get_session)]):
-    service = CategoryService()
-    response = service.read_categorybyId(id = id, session = session)
-    return {
-        "message":"A category by id",
-        "response":response
-        }
 
-@router.patch("/{id}")
+    return CategoryService.read_categorybyId(session,id)
+
+@router.patch(
+    "/{id}",
+    response_model = CategoryResponse
+)
 def update_category(id:int,
                     inputCategory:CategoryUpdate, 
                     session:Annotated[SessionLocal, Depends(get_session)]):
-    service = CategoryService()
-    response = service.update_categorybyId(id = id,input_category = inputCategory,session = session)
-    return {
-        "message":"A category update",
-        "response":response
-        }
+    
+    return CategoryService.update_categorybyId(session, id, inputCategory)
 
-@router.delete("/{id}")
+@router.delete(
+    "/{id}",
+)
 def delete_category(id:int,session:Annotated[SessionLocal, Depends(get_session)]):
-    service = CategoryService()
-    service.delete_categorybyId(id = id, session = session)
-    return {"message":"A Category deleted"}
+
+    return  CategoryService.delete_categorybyId(session,id)
 

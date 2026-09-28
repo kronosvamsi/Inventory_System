@@ -4,49 +4,90 @@
 """
 from models.categories import Category
 from sqlalchemy import select
-from schemas.category_schema import CategoryResponse
+from sqlalchemy.orm import Session
+from schemas.category_schema import (
+    CategoryCreate,
+    CategoryUpdate
+)
 
 class CategoryService():
-    count = 0
     
-    def __init__(self):
-        CategoryService.count+=1
-    
-    def create_category(self,**kwargs):
-        new_category = kwargs["input_category"]
-        session = kwargs["session"]
-        db_record = Category(**new_category.model_dump())
-        session.add(db_record)
-        session.commit()
-        return new_category
-    
-    def read_categories(self, session):
-        db_records = session.scalars(select(Category)).all()
-        response = [CategoryResponse.model_validate(record) for record in db_records]
-        return response
+    @staticmethod
+    def create_category(db:Session, category_data:CategoryCreate):
         
-    def read_categorybyId(self,**kwargs):
-        id = kwargs['id']
-        session = kwargs['session']
-        db_record = session.scalars(select(Category).filter_by(id=id)).first()
-        return CategoryResponse.model_validate(db_record)
-    
-    def update_categorybyId(self,**kwargs):
-        session = kwargs["session"]
-        new_category = kwargs["input_category"]
-        id = kwargs["id"]
-        db_record = session.scalars(select(Category).filter_by(id=id)).first()
-        update_data = new_category.model_dump()
-        for key,val in update_data.items():
-            setattr(db_record,key,val)
+        category_item = db.scalar(select(Category).where(Category.name == category_data.name))
         
-        session.commit()
-        session.refresh(db_record)
-        return db_record
+        if category_item :
+            raise ValueError("The Category item is already exists !")
+        
+        category = Category(
+            name = category_data.name, 
+            description = category_data.description
+            )
+        db.add(category)
+
+        db.flush()
+        
+        db.commit()
+
+        db.refresh(category)
+
+        return category
     
-    def delete_categorybyId(self,**kwargs):
-        session = kwargs["session"]
-        id = kwargs["id"]
-        db_record = session.scalars(select(Category).filter_by(id=id)).first()
-        session.delete(db_record)
-        session.commit()
+    @staticmethod
+    def read_categories(db:Session):
+        categories = db.scalars(
+            select(Category).order_by(Category.id)
+            ).all()
+        
+        return categories
+    
+    @staticmethod
+    def read_categorybyId(db:Session, id:int):
+        
+        category = db.scalar(
+            select(Category).where(
+                Category.id == id
+                )
+            )
+        if not category:
+            raise ValueError(f"The Category by id {id} not found")
+
+        return category
+   
+   
+    @staticmethod
+    def update_categorybyId(db:Session, id:int, update_category:CategoryUpdate):
+        
+        category = db.scalar(
+            select(Category).where(
+                Category.id == id
+                )
+            )
+        if not category:
+            raise ValueError(f"The Category by id {id} not found")
+        
+        update_data = update_category.model_dump()
+        
+        for field,val in update_data.items():
+            setattr(category,field,val)
+        
+        db.commit()
+        db.refresh(category)
+        return category
+    
+    def delete_categorybyId(db:Session, id:int):
+        
+        category = db.scalar(
+            select(Category).where(
+                Category.id == id
+                )
+            
+            )
+        if not category :
+            raise ValueError(f"The Category by id {id} not found")
+        
+        db.delete(category)
+        db.commit()
+
+        return {"message":f"The Category with id {id} deleted successfully"}

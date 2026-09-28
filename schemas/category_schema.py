@@ -1,9 +1,8 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict,Field
 
-class CategoryInput(BaseModel):
-    id:int
-    name:str
-    description:str
+class CategoryCreate(BaseModel):
+    name:str = Field(min_length = 1, max_length = 50)
+    description:str = Field(min_length = 1, max_length = 150)
 
 class CategoryResponse(BaseModel):
     id:int
@@ -13,5 +12,5 @@ class CategoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes = True)
 
 class CategoryUpdate(BaseModel):
-    name:str
-    description:str
+    name:str =  Field(min_length = 1, max_length = 50)
+    description:str = Field(min_length = 1, max_length = 150)
