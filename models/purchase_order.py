@@ -9,7 +9,7 @@ from .order_status import StatusType
 class PurchaseOrder(Base):
     __tablename__ = "purchase_orders"
 
-    id:Mapped[int] = mapped_column(Integer, primary_key = True, index = True)
+    id:Mapped[int] = mapped_column(Integer, primary_key = True, index = True, autoincrement=True)
     supplier_id:Mapped[int] = mapped_column(ForeignKey("suppliers.id"), nullable=False)
     product_id:Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
     quantity:Mapped[int] = mapped_column(Integer, nullable = False)
