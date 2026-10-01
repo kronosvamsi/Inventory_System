@@ -9,7 +9,7 @@ class SalesOrder(Base):
 
     __tablename__ = "sales_order"
     
-    id:Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True, index=True,autoincrement= True)
     customer_id:Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)
     product_id:Mapped[int] = mapped_column(ForeignKey("products.id"), nullable = False)
     quantity:Mapped[int] = mapped_column(Integer, nullable=False, default=0)
