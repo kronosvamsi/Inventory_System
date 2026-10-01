@@ -1,8 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class PurchaseOrder(BaseModel):
-    id:int
+class PurchaseData(BaseModel):
     supplier_id:int
     product_id:int
     quantity:int
@@ -12,3 +11,5 @@ class PurchaseOrderResponse(BaseModel):
     supplier_id:int
     product_id:int
     quantity:int
+
+    model_config = ConfigDict(from_attributes = True)

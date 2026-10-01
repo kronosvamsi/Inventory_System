@@ -2,7 +2,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from models import Supplier, PurchaseOrder, Product
-from schemas.purchase_schema import PurchaseOrder
 from schemas.inventory_schema import ReceiveStockRequest
 from models.order_status import StatusType
 from services.inventory_service import InventoryService
@@ -12,8 +11,9 @@ class PurchaseService():
     
     def __init__(self):
         pass
-
-    def create_purchase_order(self,db,request):
+    
+    @staticmethod
+    def create_purchase_order(db,request):
         supplier = db.execute(select(Supplier).where(Supplier.id == request.supplier_id)).first()
         if supplier is None:
             raise Exception("NO supplier found")
@@ -28,9 +28,11 @@ class PurchaseService():
         
         db.add(purchase_order)
         db.commit()
+        db.refresh(purchase_order)
 
         return purchase_order
     
+    @staticmethod
     def approve_purchase_order(purchase_order_id:int, db:Session):
         purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).first()
         if purchase_order.status != StatusType.PENDING:
@@ -40,7 +42,8 @@ class PurchaseService():
         db.commit()
         db.refresh(purchase_order)
         return purchase_order
-
+    
+    @staticmethod
     def receive_purchase_order(purchase_order_id:int , db:Session):
         purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).first()
         if purchase_order.status != StatusType.APPROVED:
@@ -60,4 +63,13 @@ class PurchaseService():
         db.commit()
         db.refresh(purchase_order)
         return purchase_order
-
+    
+    @staticmethod
+    def get_purchase_orders(db):
+        purchase_orders = db.execute(
+            select(PurchaseOrder).order_by(
+                PurchaseOrder.id
+            )
+        ).scalars().all()
+        
+        return purchase_orders
