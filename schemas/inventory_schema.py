@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class BaseStockRequest(BaseModel):
     product_id:int
@@ -16,6 +16,14 @@ class AdjustStockRequest(BaseStockRequest):
     reference_type:str | None = None
     reference_id:int | None = None
     reason:str
+
+class StockResponse(BaseModel):
+    id : int
+    product_id :int
+    quantity_available :int
+    reorder_level :int
+
+    model_config = ConfigDict(from_attributes = True)
 
 """" Check fields inherited """
 # print(ReceiveStockRequest.model_fields.keys())

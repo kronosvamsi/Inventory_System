@@ -99,4 +99,13 @@ class InventoryService():
         db.commit()
         db.refresh(inventory_record)
         return inventory_record
+    
+    @staticmethod  
+    def get_inventory_items(db):
+        inventory_items = db.execute(
+            select(Inventory).order_by(Inventory.id)
+            ).scalars().all()
+        
+        print("items:",inventory_items)
+        return inventory_items
         

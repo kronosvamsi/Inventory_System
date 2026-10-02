@@ -26,3 +26,7 @@ def approve_order( id:int , db :Session = Depends(get_session)):
 @router.patch("/order/send/{id}" , response_model= SaleDataResponse)
 def send_order( id:int , db :Session = Depends(get_session)):
     return SaleService.send_sale_order(db , id)
+
+@router.get("/order", response_model= list[SaleDataResponse])
+def sale_order(db:Session = Depends(get_session)):
+    return SaleService.get_sale_orders(db)

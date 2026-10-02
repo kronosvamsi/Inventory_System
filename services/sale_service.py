@@ -39,7 +39,8 @@ class SaleService():
     
     @staticmethod
     def approve_sale_order(db , sale_order_id):
-        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id))
+        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar()
+        
         if sale_order.status != StatusType.PENDING:
             raise Exception(f"The sale order with id {sale_order_id} is Invalid")
         
@@ -51,7 +52,7 @@ class SaleService():
     
     @staticmethod
     def send_sale_order(db , sale_order_id):
-        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id))
+        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar()
         if sale_order.status != StatusType.APPROVED:
             raise Exception(f"The sale order with id {sale_order_id} is Invalid")
         
@@ -62,10 +63,18 @@ class SaleService():
             reference_id = sale_order.product_id
         )
 
-        InventoryService.sell_stock(db,stock_request)
+        service = InventoryService()
+        service.sell_stock(db, stock_request)
 
         sale_order.status = StatusType.SHIPPED
         db.commit()
         db.refresh(sale_order)
 
         return sale_order
+    
+    def get_sale_orders(db):
+        saleorders = db.execute(
+            select(SalesOrder).order_by(SalesOrder.id)
+            ).scalars().all()
+        
+        return saleorders

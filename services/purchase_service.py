@@ -55,8 +55,8 @@ class PurchaseService():
             reference_type = "PURCHASE_ORDER", 
             reference_id = purchase_order.id
         )
-        
-        InventoryService.receive_stock(db,receivestock_request)
+        service = InventoryService()
+        service.receive_stock(db,receivestock_request)
 
         purchase_order.status = StatusType.RECEIVED
 
