@@ -34,7 +34,8 @@ class PurchaseService():
     
     @staticmethod
     def approve_purchase_order(purchase_order_id:int, db:Session):
-        purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).first()
+        purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).scalar_one_or_none()
+        # print("po",purchase_order)
         if purchase_order.status != StatusType.PENDING:
             raise Exception( f"An Invalid Purchase Order {purchase_order.status}")
         
@@ -45,7 +46,7 @@ class PurchaseService():
     
     @staticmethod
     def receive_purchase_order(purchase_order_id:int , db:Session):
-        purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).first()
+        purchase_order = db.execute(select(PurchaseOrder).where(PurchaseOrder.id == purchase_order_id )).scalar_one_or_none()
         if purchase_order.status != StatusType.APPROVED:
             raise Exception(f"An Invalid Purchase order status {purchase_order.status} ")
         
@@ -56,8 +57,8 @@ class PurchaseService():
             reference_id = purchase_order.id
         )
         service = InventoryService()
-        service.receive_stock(db,receivestock_request)
-
+        inventory_record = service.validate_and_get_inventory_record(db,receivestock_request)
+        service.increase_stock_and_transaction(inventory_record, receivestock_request,db)
         purchase_order.status = StatusType.RECEIVED
 
         db.commit()

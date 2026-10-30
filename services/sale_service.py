@@ -39,10 +39,10 @@ class SaleService():
     
     @staticmethod
     def approve_sale_order(db , sale_order_id):
-        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar()
+        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar_one_or_none()
         
         if sale_order.status != StatusType.PENDING:
-            raise Exception(f"The sale order with id {sale_order_id} is Invalid")
+            raise Exception(f"An Invalid Sale Order {sale_order.status} ")
         
         sale_order.status = StatusType.APPROVED
         db.commit()
@@ -52,9 +52,9 @@ class SaleService():
     
     @staticmethod
     def send_sale_order(db , sale_order_id):
-        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar()
+        sale_order = db.execute(select(SalesOrder).where(SalesOrder.id == sale_order_id)).scalar_one_or_none()
         if sale_order.status != StatusType.APPROVED:
-            raise Exception(f"The sale order with id {sale_order_id} is Invalid")
+            raise Exception(f"An Invalid Sale Order {sale_order.status}")
         
         stock_request = SellStockRequest(
             product_id = sale_order.product_id,
@@ -64,8 +64,8 @@ class SaleService():
         )
 
         service = InventoryService()
-        service.sell_stock(db, stock_request)
-
+        inventory_record = service.validate_and_get_inventory_record(db,stock_request)
+        service.decrease_stock_and_transaction(inventory_record,stock_request,db)
         sale_order.status = StatusType.SHIPPED
         db.commit()
         db.refresh(sale_order)

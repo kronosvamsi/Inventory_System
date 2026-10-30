@@ -41,41 +41,45 @@ class InventoryService():
         if quantity < 0:
             raise NewQuantityError(message = "New Quantity should be positive(greater or equal to zero)", quantity = quantity)
     
-    @db_exc_handler
-    def receive_stock(self, db, request):
+    
+    def validate_and_get_inventory_record(self, db,request):
         self._validate_request_quantity(request.quantity)
         product = self._get_product(db,request.product_id)
-        stock_record = self._get_inventory(db, request.product_id)
-        received_quantity = request.quantity
-        stock_record.quantity_available += received_quantity
-        
-        transaction = InventoryTransaction(product_id = product.id,
-                                           quantity = received_quantity,transaction_type = TransactionType.PURCHASE,
-                                           reference_type = request.reference_type,reference_id = request.reference_id)
-        
-        db.add(transaction)
-        db.commit()
-        db.refresh(stock_record)
-        return stock_record
+        return  self._get_inventory(db, request.product_id)
     
-    @db_exc_handler
-    def sell_stock(self,db, request):
-        self._validate_request_quantity(request.quantity)
-        product = self._get_product(db, request.product_id)
-        inventory_record = self._get_inventory(db,request.product_id)
+    @staticmethod
+    def increase_stock_and_transaction(inventory_record,request,db):
+        inventory_record.quantity_available += request.quantity
+        transaction = InventoryTransaction(product_id = request.product_id,
+                                           quantity = request.quantity,transaction_type = TransactionType.PURCHASE,
+                                           reference_type = request.reference_type,reference_id = request.reference_id)
+        db.add(transaction)
+    
+    @staticmethod
+    def decrease_stock_and_transaction(inventory_record, request, db):
         available = inventory_record.quantity_available
         if available < request.quantity:
             raise OutOfStockError(message = "The request quantity is not available", available_quantity=available, required_quantity=request.quantity)
-        
         inventory_record.quantity_available -= request.quantity
-        
         transaction = InventoryTransaction(
-            product_id = product.id,  quantity = request.quantity,
+            product_id = request.product_id, quantity = request.quantity,
             transaction_type = TransactionType.SALE, reference_type = request.reference_type,
             reference_id = request.reference_id
         )
-        
         db.add(transaction)
+    
+    @db_exc_handler
+    def receive_stock(self, db, request):
+        inventory_record = self.validate_and_get_inventory_record(db,request)
+        self.increase_stock_and_transaction(inventory_record, request,db)
+        db.commit()
+        db.refresh(inventory_record)
+        return inventory_record
+    
+    @db_exc_handler
+    def sell_stock(self,db, request):
+        inventory_record = self.validate_and_get_inventory_record(db,request)
+        self.decrease_stock_and_transaction(inventory_record,request,db)
         db.commit()
         db.refresh(inventory_record)
         return inventory_record
@@ -106,6 +110,6 @@ class InventoryService():
             select(Inventory).order_by(Inventory.id)
             ).scalars().all()
         
-        print("items:",inventory_items)
+        # print("items:",inventory_items)
         return inventory_items
         

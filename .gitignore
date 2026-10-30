@@ -3,3 +3,4 @@ alembic.ini
 alembic/
 .env
 /__pycache__/
+/docs.txt
